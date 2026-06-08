@@ -15,7 +15,7 @@ function AuthPage({ onAuthSuccess, onBackToLanding }) {
     setError('');
     setLoading(true);
 
-    const isServerMode = window.location.origin.includes('localhost:3000') || window.location.origin.includes('127.0.0.1:3000');
+    const isServerMode = window.location.protocol.startsWith('http');
 
     if (!isServerMode) {
       // Fallback local mode (portabilidad in-memory)

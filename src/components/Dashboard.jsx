@@ -109,7 +109,7 @@ function Dashboard() {
     }
   })
 
-  const isServerMode = typeof window !== 'undefined' && (window.location.origin.includes('localhost:3000') || window.location.origin.includes('127.0.0.1:3000'));
+  const isServerMode = typeof window !== 'undefined' && window.location.protocol.startsWith('http');
 
   // Sync settings with LocalStorage and Server (if in server mode)
   useEffect(() => {
