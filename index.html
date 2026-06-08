@@ -564,7 +564,7 @@ Hemos pausado tu acceso temporalmente. Puedes reanudarlo al instante actualizand
     }
   })
 
-  const isServerMode = typeof window !== 'undefined' && (window.location.origin.includes('localhost:3000') || window.location.origin.includes('127.0.0.1:3000'));
+  const isServerMode = typeof window !== 'undefined' && window.location.protocol.startsWith('http');
 
   // Sync settings with LocalStorage and Server (if in server mode)
   useEffect(() => {
@@ -2039,7 +2039,7 @@ Para evitar que se pierda el acceso a tus datos, por favor reintenta el pago aqu
           setError('');
           setLoading(true);
 
-          const isServerMode = window.location.origin.includes('localhost:3000') || window.location.origin.includes('127.0.0.1:3000');
+          const isServerMode = window.location.protocol.startsWith('http');
 
           if (!isServerMode) {
             setLoading(false);
