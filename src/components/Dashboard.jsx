@@ -268,8 +268,14 @@ function Dashboard() {
         }, 800)
 
         setTimeout(() => {
-          const step1 = settings.dunningSequence[0];
-          addLog(`Resend API: Enviado correo Paso 1 "${step1.title}" a ${simEmail}`)
+          // Show REAL email status from server
+          if (newClient.emailStatus === 'sent') {
+            addLog(`✅ Resend API: ${newClient.emailMessage}`)
+          } else if (newClient.emailStatus === 'error') {
+            addLog(`❌ ${newClient.emailMessage}`)
+          } else {
+            addLog(`⚠️ ${newClient.emailMessage || 'Email no enviado (clave API no configurada)'}`)
+          }
           setActiveEmailPreview({
             id: newClient.id,
             name: simName,

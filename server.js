@@ -260,6 +260,8 @@ app.post('/api/settings', authenticate, async (req, res) => {
 app.post('/api/simulate-webhook', authenticate, async (req, res) => {
   const { name, email, amount } = req.body;
   const userId = req.userId;
+  let emailStatus = 'skipped';
+  let emailMessage = 'RESEND_API_KEY no configurada. Usando clave mock — no se envían correos reales.';
   
   try {
     const newClient = await addClient(userId, name, email, amount);
@@ -276,10 +278,11 @@ app.post('/api/simulate-webhook', authenticate, async (req, res) => {
         .replace(/{monto}/g, `$${amount} USD`);
 
       console.log(`📧 [Simulated Email] Dispatching dunning email (Paso 1) to ${email}...`);
+      console.log(`🔑 [Debug] RESEND_API_KEY is: ${resendApiKey === 're_mock_key' ? 'MOCK (not configured)' : 'REAL (configured, starts with ' + resendApiKey.substring(0, 8) + '...)'}`);
 
       if (resendApiKey !== 're_mock_key') {
         try {
-          await resend.emails.send({
+          const resendResponse = await resend.emails.send({
             from: `${settings.businessName} <onboarding@resend.dev>`,
             to: email,
             subject: step.subject,
@@ -305,14 +308,20 @@ app.post('/api/simulate-webhook', authenticate, async (req, res) => {
               </div>
             `
           });
-          console.log(`✅ [Simulated Email] Resend successfully dispatched email to ${email}!`);
+          console.log(`✅ [Simulated Email] Resend successfully dispatched email to ${email}!`, resendResponse);
+          emailStatus = 'sent';
+          emailMessage = `Correo enviado exitosamente a ${email} via Resend (ID: ${resendResponse?.data?.id || 'unknown'})`;
         } catch (errEmail) {
-          console.error(`❌ [Simulated Email] Resend failed to send: ${errEmail.message}`);
+          console.error(`❌ [Simulated Email] Resend failed to send:`, errEmail);
+          emailStatus = 'error';
+          emailMessage = `Error de Resend: ${errEmail.message}`;
         }
+      } else {
+        console.log('⚠️ [Simulated Email] RESEND_API_KEY is mock. Skipping real email send.');
       }
     }
 
-    res.json(newClient);
+    res.json({ ...newClient, emailStatus, emailMessage });
   } catch (err) {
     console.error('❌ Error processing simulated webhook:', err.message);
     res.status(500).json({ error: err.message });
