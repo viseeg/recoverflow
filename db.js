@@ -229,16 +229,22 @@ export async function registerUser(email, password, businessName) {
 export async function authenticateUser(email, password) {
   const db = await readDB();
   const lowerEmail = email.toLowerCase().trim();
+  console.log(`🔍 [Auth] Looking for user: "${lowerEmail}" among ${db.users.length} users: [${db.users.map(u => u.email).join(', ')}]`);
+  
   const user = db.users.find(u => u.email.toLowerCase() === lowerEmail);
   if (!user) {
+    console.log(`🔍 [Auth] User "${lowerEmail}" NOT FOUND in database.`);
     return null;
   }
 
+  console.log(`🔍 [Auth] User found: ${user.id}. Verifying password... (salt exists: ${!!user.salt}, hash exists: ${!!user.passwordHash})`);
   const isValid = verifyPassword(password, user.salt, user.passwordHash);
   if (!isValid) {
+    console.log(`🔍 [Auth] Password verification FAILED for ${user.email}.`);
     return null;
   }
 
+  console.log(`🔍 [Auth] Password verification SUCCESS for ${user.email}.`);
   const { passwordHash: _, salt: __, ...userPublic } = user;
   return userPublic;
 }

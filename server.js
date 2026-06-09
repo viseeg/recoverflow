@@ -184,6 +184,7 @@ app.use(express.json());
 // 3. Auth REST API Routes
 app.post('/api/auth/register', async (req, res) => {
   const { email, password, businessName } = req.body;
+  console.log(`🔐 [Register] Attempt for email: ${email}`);
   if (!email || !password) {
     return res.status(400).json({ error: 'Email y contraseña requeridos.' });
   }
@@ -191,14 +192,17 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     const user = await registerUser(email, password, businessName);
     const token = generateToken(user);
+    console.log(`✅ [Register] Success! User created: ${user.id} (${user.email})`);
     res.status(201).json({ user, token });
   } catch (err) {
+    console.error(`❌ [Register] Failed for ${email}: ${err.message}`);
     res.status(400).json({ error: err.message });
   }
 });
 
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
+  console.log(`🔐 [Login] Attempt for email: ${email}`);
   if (!email || !password) {
     return res.status(400).json({ error: 'Email y contraseña requeridos.' });
   }
@@ -206,11 +210,14 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const user = await authenticateUser(email, password);
     if (!user) {
+      console.error(`❌ [Login] Failed for ${email}: user not found or password mismatch`);
       return res.status(401).json({ error: 'Credenciales inválidas.' });
     }
     const token = generateToken(user);
+    console.log(`✅ [Login] Success! User: ${user.id} (${user.email})`);
     res.json({ user, token });
   } catch (err) {
+    console.error(`❌ [Login] Error for ${email}: ${err.message}`);
     res.status(500).json({ error: err.message });
   }
 });

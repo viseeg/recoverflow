@@ -167,6 +167,7 @@ function App() {
     if (savedToken && savedUser) {
       setToken(savedToken)
       setUser(JSON.parse(savedUser))
+      setCurrentView('dashboard')
     }
   }, [])
 
