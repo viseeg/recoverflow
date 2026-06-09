@@ -127,7 +127,7 @@ app.post('/api/webhook/:userId', express.raw({ type: 'application/json' }), asyn
             console.log('⚠️ Mocking email send via Resend. Configure RESEND_API_KEY for real delivery.');
           } else {
             await resend.emails.send({
-              from: `${settings.businessName} <facturacion@recoverflow.com>`,
+              from: `${settings.businessName} <onboarding@resend.dev>`,
               to: customerEmail,
               subject: step.subject,
               html: `
@@ -280,7 +280,7 @@ app.post('/api/simulate-webhook', authenticate, async (req, res) => {
       if (resendApiKey !== 're_mock_key') {
         try {
           await resend.emails.send({
-            from: `${settings.businessName} <facturacion@recoverflow.com>`,
+            from: `${settings.businessName} <onboarding@resend.dev>`,
             to: email,
             subject: step.subject,
             html: `
@@ -349,7 +349,7 @@ app.post('/api/clients/:id/advance', authenticate, async (req, res) => {
       if (resendApiKey !== 're_mock_key') {
         try {
           await resend.emails.send({
-            from: `${settings.businessName} <facturacion@recoverflow.com>`,
+            from: `${settings.businessName} <onboarding@resend.dev>`,
             to: updatedClient.email,
             subject: step.subject,
             html: `
